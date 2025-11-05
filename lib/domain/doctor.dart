@@ -38,6 +38,7 @@ class Doctor extends Staff {
     super.displayInfo();
     print('Specialization: $specialization');
     print('Years of Experience: $yearsOfExperience');
+    print('Monthly Salary: \$${calculateMonthlySalary().toStringAsFixed(2)}');
   }
   @override
   double calculateMonthlySalary() {

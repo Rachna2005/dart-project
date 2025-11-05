@@ -38,6 +38,7 @@ class Nurse extends Staff {
   void displayInfo() {
     super.displayInfo();
     print('Nurse Level: $level');
+    print('Monthly Salary: \$${calculateMonthlySalary().toStringAsFixed(2)}');
   }
 
   @override

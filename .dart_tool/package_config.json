@@ -316,7 +316,7 @@
   ],
   "generator": "pub",
   "generatorVersion": "3.9.2",
-  "flutterRoot": "file:///C:/src/flutter",
+  "flutterRoot": "file:///C:/flutter/flutter",
   "flutterVersion": "3.35.5",
   "pubCache": "file:///C:/Users/DELL/AppData/Local/Pub/Cache"
 }

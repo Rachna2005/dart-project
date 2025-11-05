@@ -31,10 +31,17 @@ class Hospital {
   }
 
   void addStaffToDepartment(Staff staff, Department department) {
-    department.addStaff(staff);
-    staff.department = department;
-    print('${staff.name} added to ${department.name} department.');
+  // Remove from old department if exists
+  if (staff.department != null) {
+    staff.department!.removeStaff(staff);
   }
+
+  // Add to new department
+  department.addStaff(staff);
+  staff.department = department;
+  print('${staff.name} added to ${department.name} department.');
+}
+
 
   void assignShiftToStaff(Staff staff, Schedule schedule) {
     staff.assignSchedule(schedule);

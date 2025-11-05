@@ -32,10 +32,10 @@ abstract class Staff {
     print('ID: $id');
     print('Name: $name');
     print('Gender: $gender');
-    print('Date of Birth: ${dateOfBirth.toLocal()}'.split(' ')[0]);
+    print('Date of Birth: ${dateOfBirth.toLocal().toString().split(' ')[0]}');
     print('Contact: $contactNumber');
     print('Email: $email');
-    print('Start Date: ${startDate.toLocal()}'.split(' ')[0]);
+    print('Start Date: ${startDate.toLocal().toString().split(' ')[0]}');
     print('Department: ${department?.name ?? "Not assigned"}');
     print('Active: ${active ? "Yes" : "No"}');
     print('Base Salary: ${salary}');

@@ -38,6 +38,7 @@ class AdministrativeStaff extends Staff {
   void displayInfo() {
     super.displayInfo();
     print('Position: $position');
+    print('Monthly Salary: \$${calculateMonthlySalary().toStringAsFixed(2)}');
   }
 
   @override
