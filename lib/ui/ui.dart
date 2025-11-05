@@ -6,6 +6,7 @@ import '../domain/nurse.dart';
 import '../domain/administrative_staff.dart';
 import '../domain/schedule.dart';
 import '../domain/staff.dart';
+import 'package:my_first_project/data/id_generator.dart';
 
 
 class ConsoleUI {
@@ -94,8 +95,21 @@ class ConsoleUI {
     stdout.write("Choose type: ");
     String? type = stdin.readLineSync();
 
-    stdout.write("Enter ID: ");
-    int id = int.parse(stdin.readLineSync()!);
+     String id = '';
+  switch (type) {
+    case '1':
+      id = IdGenerator.generateDoctorId();
+      break;
+    case '2':
+      id = IdGenerator.generateNurseId();
+      break;
+    case '3':
+      id = IdGenerator.generateAdminId();
+      break;
+    default:
+      print("Invalid staff type!");
+  }
+  print("ID: $id");
     stdout.write("Name: ");
     String name = stdin.readLineSync()!;
     stdout.write("Gender: ");

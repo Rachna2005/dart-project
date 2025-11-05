@@ -8,7 +8,7 @@ class AdministrativeStaff extends Staff {
   AdminPosition position;
 
   AdministrativeStaff({
-    required int id,
+    required String id,
     required String name,
     required String gender,
     required DateTime dateOfBirth,

@@ -8,7 +8,7 @@ class Nurse extends Staff {
   NurseLevel level;
 
   Nurse({
-    required int id,
+    required String id,
     required String name,
     required String gender,
     required DateTime dateOfBirth,

@@ -6,7 +6,7 @@ class Doctor extends Staff {
   int yearsOfExperience;
 
   Doctor({
-    required int id,
+    required String id,
     required String name,
     required String gender,
     required DateTime dateOfBirth,

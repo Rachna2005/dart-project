@@ -2,14 +2,14 @@ import 'department.dart';
 import 'schedule.dart';
 
 abstract class Staff {
-  final int id;
+  final String id;
   String name;
   String gender;
   DateTime dateOfBirth;
   DateTime startDate;
   String contactNumber;
   String email;
-  double salary;
+  double _salary;
   Department? department;
   bool active;
   Schedule? schedule;
@@ -20,12 +20,20 @@ abstract class Staff {
     required this.dateOfBirth,
     required this.contactNumber,
     required this.email,
-    required this.salary,
+    required double salary,
     required this.startDate,
     this.department,
     this.active = true,
     this.schedule,
-  });
+  }): _salary = salary;
+  double get salary => _salary;
+  set salary(double newSalary) {
+    if (newSalary >= 0) {
+      _salary = newSalary;
+    } else {
+      throw ArgumentError("Salary cannot be negative");
+    }
+  }
 
   void displayInfo() {
     print('--- $name Info ---');
