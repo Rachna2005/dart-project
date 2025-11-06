@@ -1,4 +1,8 @@
-enum Shift { Morning, Afternoon, Night }
+enum Shift { Morning, Evening, Night }
+
+// Morning 7 AM – 3 PM
+// Evening 3 PM – 11 PM
+// Night 11 PM – 7 AM
 
 class Schedule {
   int weekNumber;
@@ -9,13 +13,13 @@ class Schedule {
       {required this.weekNumber, required this.shift, List<String>? daysOff})
       : daysOff = daysOff ?? ['Sat', 'Sun'];
 
-  /// For nurses: rotate shift in order Morning -> Afternoon -> Night -> Morning ...
+  // For nurses: rotate shift in order Morning - Afternoon - Night - Morning ...
   void rotateShift() {
     switch (shift) {
       case Shift.Morning:
-        shift = Shift.Afternoon;
+        shift = Shift.Evening;
         break;
-      case Shift.Afternoon:
+      case Shift.Evening:
         shift = Shift.Night;
         break;
       case Shift.Night:

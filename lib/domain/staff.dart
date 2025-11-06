@@ -9,7 +9,7 @@ abstract class Staff {
   DateTime startDate;
   String contactNumber;
   String email;
-  double _salary;
+  double salary;
   Department? department;
   bool active;
   Schedule? schedule;
@@ -20,20 +20,12 @@ abstract class Staff {
     required this.dateOfBirth,
     required this.contactNumber,
     required this.email,
-    required double salary,
+    required this.salary,
     required this.startDate,
     this.department,
     this.active = true,
     this.schedule,
-  }): _salary = salary;
-  double get salary => _salary;
-  set salary(double newSalary) {
-    if (newSalary >= 0) {
-      _salary = newSalary;
-    } else {
-      throw ArgumentError("Salary cannot be negative");
-    }
-  }
+  });
 
   void displayInfo() {
     print('--- $name Info ---');

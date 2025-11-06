@@ -5,11 +5,11 @@ class Department {
   String name;
   List<Staff> staffMembers;
 
-  Department({
+ Department({
     required this.id,
     required this.name,
-    required this.staffMembers,
-  });
+    List<Staff>? staffMembers ,
+  }): staffMembers = staffMembers ?? [];
 
   void addStaff(Staff staff) {
     staffMembers.add(staff);
@@ -26,13 +26,6 @@ class Department {
     }
   }
 
-  //   Staff? findStaffById(int id) {
-  //   return staffMembers.firstWhere(
-  //     (staff) => staff.id == id,
-  //     orElse: () => null,
-  //   );
-  // }
-
   void displayDepartmentInfo() {
     print('--- Department: $name ---');
     if (staffMembers.isEmpty) {
@@ -43,6 +36,10 @@ class Department {
       }
     }
   }
+
+  List<Staff> getAllStaff() {
+  return staffMembers;
+}
 
   @override
   String toString() {

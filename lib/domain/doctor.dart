@@ -1,8 +1,16 @@
 import 'staff.dart';
 import 'department.dart';
 import 'schedule.dart';
+enum DoctorSpecialization {
+  Cardiology,
+  Neurology,
+  Pediatrics,
+  Orthopedics,
+  Radiology,
+  GeneralMedicine,
+}
 class Doctor extends Staff {
-  String specialization;
+  DoctorSpecialization specialization;
   int yearsOfExperience;
 
   Doctor({
