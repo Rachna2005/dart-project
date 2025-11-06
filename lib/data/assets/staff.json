@@ -1,0 +1,70 @@
+{
+  "staff": [
+    {
+      "id": "DT0001",
+      "name": "q",
+      "gender": "f",
+      "dateOfBirth": "1123-11-13T00:00:00.000",
+      "contactNumber": "321",
+      "email": "qqq",
+      "salary": 10.0,
+      "startDate": "2025-11-06T12:24:16.796351",
+      "type": "Doctor",
+      "specialization": "doc",
+      "yearsOfExperience": 3
+    },
+    {
+      "id": "NS0002",
+      "name": "t",
+      "gender": "t",
+      "dateOfBirth": "2121-12-21T00:00:00.000",
+      "contactNumber": "213",
+      "email": "tttt",
+      "salary": 21.0,
+      "startDate": "2025-11-06T12:25:51.693155",
+      "type": "Nurse",
+      "level": 2
+    },
+    {
+      "id": "DT0002",
+      "name": "i",
+      "gender": "i",
+      "dateOfBirth": "3223-10-22T00:00:00.000",
+      "contactNumber": "231",
+      "email": "iiiii",
+      "salary": 2.0,
+      "startDate": "2025-11-06T12:26:29.511186",
+      "type": "Doctor",
+      "specialization": "g",
+      "yearsOfExperience": 3
+    },
+    {
+      "id": "NS0001",
+      "name": "h",
+      "gender": "h",
+      "dateOfBirth": "1211-11-22T00:00:00.000",
+      "contactNumber": "12",
+      "email": "hhhh",
+      "salary": 10.0,
+      "startDate": "2025-11-06T12:33:17.471933",
+      "schedule": {
+        "weekNumber": 2,
+        "shift": 0
+      },
+      "type": "Nurse",
+      "level": 1
+    },
+    {
+      "id": "NS0001",
+      "name": "r",
+      "gender": "r",
+      "dateOfBirth": "3335-10-03T00:00:00.000",
+      "contactNumber": "000",
+      "email": "mmmmmmmmmmmm",
+      "salary": 10.0,
+      "startDate": "2025-11-06T12:25:22.660144",
+      "type": "Nurse",
+      "level": 2
+    }
+  ]
+}

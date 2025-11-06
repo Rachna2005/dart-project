@@ -1,3 +1,4 @@
+//lib/ui/ui.dart
 import 'dart:io';
 import '../domain/hospital.dart';
 import 'staff_menu.dart';
@@ -17,6 +18,11 @@ class ConsoleUI {
   late PayrollMenu payrollMenu = PayrollMenu(hospital);
 
   void start() {
+    // Load staff from file on startup
+    // var staffList = staffRepo.readStaff();
+    // for (var s in staffList) {
+    //   _addToAnyDepartment(s);
+    // }
     while (true) {
       print("\n Welcome to ${hospital.name} Staff Management System");
       print("==============================================");
@@ -51,3 +57,4 @@ class ConsoleUI {
   }
  
 }
+
