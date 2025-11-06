@@ -1,3 +1,4 @@
+//lib/ui/ui.dart
 import 'dart:io';
 import '../domain/hospital.dart';
 import '../domain/department.dart';
@@ -7,7 +8,7 @@ import '../domain/administrative_staff.dart';
 import '../domain/schedule.dart';
 import '../domain/staff.dart';
 import 'package:my_first_project/data/id_generator.dart';
-
+import '../data/staffRepository.dart';
 
 class ConsoleUI {
   final Hospital hospital = Hospital(
@@ -15,7 +16,15 @@ class ConsoleUI {
     address: "Phnom Penh",
   );
 
+  final StaffRepository staffRepo = StaffRepository(filePath: 'data/assets/staff.json');
+
+
   void start() {
+    // Load staff from file on startup
+    var staffList = staffRepo.readStaff();
+    for (var s in staffList) {
+      _addToAnyDepartment(s);
+    }
     while (true) {
       print("\n🏥 Welcome to ${hospital.name} Staff Management System");
       print("==============================================");
@@ -52,8 +61,7 @@ class ConsoleUI {
   // ================= STAFF MENU =================
   void manageStaffMenu() {
     while (true) {
-      print("\n👩‍⚕️ Manage Staff");
-      print("========================");
+      print("\n===Manage Staff===");
       print("1. Add new staff");
       print("2. View all staff");
       print("3. Update staff contact/email");
@@ -95,21 +103,21 @@ class ConsoleUI {
     stdout.write("Choose type: ");
     String? type = stdin.readLineSync();
 
-     String id = '';
-  switch (type) {
-    case '1':
-      id = IdGenerator.generateDoctorId();
-      break;
-    case '2':
-      id = IdGenerator.generateNurseId();
-      break;
-    case '3':
-      id = IdGenerator.generateAdminId();
-      break;
-    default:
-      print("Invalid staff type!");
-  }
-  print("ID: $id");
+    String id = '';
+    switch (type) {
+      case '1':
+        id = IdGenerator.generateDoctorId();
+        break;
+      case '2':
+        id = IdGenerator.generateNurseId();
+        break;
+      case '3':
+        id = IdGenerator.generateAdminId();
+        break;
+      default:
+        print("Invalid staff type!");
+    }
+    print("ID: $id");
     stdout.write("Name: ");
     String name = stdin.readLineSync()!;
     stdout.write("Gender: ");
@@ -143,6 +151,7 @@ class ConsoleUI {
           yearsOfExperience: exp,
         );
         _addToAnyDepartment(doctor);
+        staffRepo.writeStaff(hospital.getAllStaff());
         break;
 
       case '2':
@@ -161,10 +170,12 @@ class ConsoleUI {
           level: level,
         );
         _addToAnyDepartment(nurse);
+        staffRepo.writeStaff(hospital.getAllStaff());
         break;
 
       case '3':
-        print("Choose Admin Position: 1.Receptionist 2.HR 3.Accountant 4.ITSupport 5.Manager");
+        print(
+            "Choose Admin Position: 1.Receptionist 2.HR 3.Accountant 4.ITSupport 5.Manager");
         int pos = int.parse(stdin.readLineSync()!);
         AdminPosition position = AdminPosition.values[pos - 1];
         var admin = AdministrativeStaff(
@@ -179,6 +190,7 @@ class ConsoleUI {
           position: position,
         );
         _addToAnyDepartment(admin);
+        staffRepo.writeStaff(hospital.getAllStaff());
         break;
 
       default:
@@ -186,104 +198,105 @@ class ConsoleUI {
     }
   }
 
-  
-void viewAllStaff() {
-  var staffList = hospital.getAllStaff();
-  if (staffList.isEmpty) {
-    print("No staff yet.");
-    return;
-  }
+  void viewAllStaff() {
+    var staffList = hospital.getAllStaff();
+    if (staffList.isEmpty) {
+      print("No staff yet.");
+      return;
+    }
 
-  // Column titles
-  List<String> headers = [
-    "ID",
-    "Name",
-    "Gender",
-    "Date Birth",
-    "Start Date",
-    "Contact",
-    "Email",
-    "Department",
-    "Salary",
-    "Role/Details"
-  ];
-
-  // Calculate max width for each column
-  List<int> colWidths = List.generate(headers.length, (i) => headers[i].length);
-
-  for (var s in staffList) {
-    List<String> row = [
-      s.id.toString(),
-      s.name,
-      s.gender,
-      '${s.dateOfBirth.year}-${s.dateOfBirth.month.toString().padLeft(2, '0')}-${s.dateOfBirth.day.toString().padLeft(2, '0')}',
-      '${s.startDate.year}-${s.startDate.month.toString().padLeft(2, '0')}-${s.startDate.day.toString().padLeft(2, '0')}',
-      s.contactNumber,
-      s.email,
-      s.department?.name ?? "Not assigned",
-      '\$${s.calculateMonthlySalary().toStringAsFixed(2)}',
-      _getStaffExtraInfo(s),
+    // Column titles
+    List<String> headers = [
+      "ID",
+      "Name",
+      "Gender",
+      "Date Birth",
+      "Start Date",
+      "Contact",
+      "Email",
+      "Department",
+      "Salary",
+      "Role/Details"
     ];
 
-    for (int i = 0; i < row.length; i++) {
-      if (row[i].length > colWidths[i]) colWidths[i] = row[i].length;
+    // Calculate max width for each column
+    List<int> colWidths =
+        List.generate(headers.length, (i) => headers[i].length);
+
+    for (var s in staffList) {
+      List<String> row = [
+        s.id.toString(),
+        s.name,
+        s.gender,
+        '${s.dateOfBirth.year}-${s.dateOfBirth.month.toString().padLeft(2, '0')}-${s.dateOfBirth.day.toString().padLeft(2, '0')}',
+        '${s.startDate.year}-${s.startDate.month.toString().padLeft(2, '0')}-${s.startDate.day.toString().padLeft(2, '0')}',
+        s.contactNumber,
+        s.email,
+        s.department?.name ?? "Not assigned",
+        '\$${s.calculateMonthlySalary().toStringAsFixed(2)}',
+        _getStaffExtraInfo(s),
+      ];
+
+      for (int i = 0; i < row.length; i++) {
+        if (row[i].length > colWidths[i]) colWidths[i] = row[i].length;
+      }
     }
-  }
 
-  // Helper to print a row
-  void printRow(List<String> row) {
-    String line = '|';
-    for (int i = 0; i < row.length; i++) {
-      line += ' ${row[i].padRight(colWidths[i])} |';
+    // Helper to print a row
+    void printRow(List<String> row) {
+      String line = '|';
+      for (int i = 0; i < row.length; i++) {
+        line += ' ${row[i].padRight(colWidths[i])} |';
+      }
+      print(line);
     }
-    print(line);
+
+    // Print table
+    // Header
+    print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
+    printRow(headers);
+    print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
+
+    // Rows
+    for (var s in staffList) {
+      List<String> row = [
+        s.id.toString(),
+        s.name,
+        s.gender,
+        '${s.dateOfBirth.year}-${s.dateOfBirth.month.toString().padLeft(2, '0')}-${s.dateOfBirth.day.toString().padLeft(2, '0')}',
+        '${s.startDate.year}-${s.startDate.month.toString().padLeft(2, '0')}-${s.startDate.day.toString().padLeft(2, '0')}',
+        s.contactNumber,
+        s.email,
+        s.department?.name ?? "Not assigned",
+        '\$${s.calculateMonthlySalary().toStringAsFixed(2)}',
+        _getStaffExtraInfo(s),
+      ];
+      printRow(row);
+    }
+
+    // Footer
+    print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
   }
-
-  // Print table
-  // Header
-  print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
-  printRow(headers);
-  print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
-
-  // Rows
-  for (var s in staffList) {
-    List<String> row = [
-      s.id.toString(),
-      s.name,
-      s.gender,
-      '${s.dateOfBirth.year}-${s.dateOfBirth.month.toString().padLeft(2, '0')}-${s.dateOfBirth.day.toString().padLeft(2, '0')}',
-      '${s.startDate.year}-${s.startDate.month.toString().padLeft(2, '0')}-${s.startDate.day.toString().padLeft(2, '0')}',
-      s.contactNumber,
-      s.email,
-      s.department?.name ?? "Not assigned",
-      '\$${s.calculateMonthlySalary().toStringAsFixed(2)}',
-      _getStaffExtraInfo(s),
-    ];
-    printRow(row);
-  }
-
-  // Footer
-  print('-' * (colWidths.reduce((a, b) => a + b) + headers.length * 3 + 1));
-}
 
 // Helper function to get role-specific info
-String _getStaffExtraInfo(Staff s) {
-  if (s is Doctor) {
-    return 'Doctor | ${s.specialization} | ${s.yearsOfExperience} yrs';
-  } else if (s is Nurse) {
-    return 'Nurse | ${s.level.name}';
-  } else if (s is AdministrativeStaff) {
-    return 'Admin | ${s.position.name}';
-  } else {
-    return '';
+  String _getStaffExtraInfo(Staff s) {
+    if (s is Doctor) {
+      return 'Doctor | ${s.specialization} | ${s.yearsOfExperience} yrs';
+    } else if (s is Nurse) {
+      return 'Nurse | ${s.level.name}';
+    } else if (s is AdministrativeStaff) {
+      return 'Admin | ${s.position.name}';
+    } else {
+      return '';
+    }
   }
-}
-
 
   void updateStaffContact() {
     stdout.write("Enter staff ID: ");
-    int id = int.parse(stdin.readLineSync()!);
-    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id, orElse: () => throw Exception("Staff not found"));
+    // int id = int.parse(stdin.readLineSync()!);
+    String id = stdin.readLineSync()!;
+    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id,
+        orElse: () => throw Exception("Staff not found"));
     stdout.write("New contact (or leave blank): ");
     String? contact = stdin.readLineSync();
     stdout.write("New email (or leave blank): ");
@@ -292,30 +305,36 @@ String _getStaffExtraInfo(Staff s) {
       newContact: contact!.isEmpty ? null : contact,
       newEmail: email!.isEmpty ? null : email,
     );
-    print("✅ Contact info updated.");
+    print("==> Contact info updated.");
+    staffRepo.writeStaff(hospital.getAllStaff()); 
   }
 
   void assignStaffToDepartment() {
     stdout.write("Enter staff ID: ");
-    int id = int.parse(stdin.readLineSync()!);
-    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id, orElse: () => throw Exception("Staff not found"));
+    // int id = int.parse(stdin.readLineSync()!);
+    String id = stdin.readLineSync()!;
+    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id,
+        orElse: () => throw Exception("Staff not found"));
 
     stdout.write("Enter department name: ");
     String deptName = stdin.readLineSync()!;
     var department = hospital.findDepartmentByName(deptName);
     if (department != null) {
       hospital.addStaffToDepartment(staff, department);
+      staffRepo.writeStaff(hospital.getAllStaff());
     }
   }
 
   void removeStaff() {
     stdout.write("Enter staff ID to remove: ");
-    int id = int.parse(stdin.readLineSync()!);
+    // int id = int.parse(stdin.readLineSync()!);
+    String id = stdin.readLineSync()!;
     for (var d in hospital.departments) {
       var toRemove = d.staffMembers.where((s) => s.id == id).toList();
       if (toRemove.isNotEmpty) {
         d.removeStaff(toRemove.first);
-        print("✅ Staff removed.");
+        print("==> Staff removed.");
+        staffRepo.writeStaff(hospital.getAllStaff());
         return;
       }
     }
@@ -324,11 +343,13 @@ String _getStaffExtraInfo(Staff s) {
 
   void _addToAnyDepartment(Staff staff) {
     if (hospital.departments.isEmpty) {
-      print("⚠ No departments yet. Creating 'General' department.");
-      hospital.addDepartment(Department(id: 1, name: "General", staffMembers: []));
+      // print("⚠ No departments yet. Creating 'General' department.");
+      hospital
+          .addDepartment(Department(id: 1, name: "General", staffMembers: []));
     }
     hospital.departments.first.addStaff(staff);
-    print("✅ Added ${staff.name} to ${hospital.departments.first.name} department.");
+    print(
+        "==> Added ${staff.name} to ${hospital.departments.first.name} department.");
   }
 
   // ================= DEPARTMENT MENU =================
@@ -339,16 +360,18 @@ String _getStaffExtraInfo(Staff s) {
       print("1. Add new department");
       print("2. View all departments");
       print("0. Back");
-      stdout.write("👉 Choose: ");
+      stdout.write(" Choose: ");
       String? choice = stdin.readLineSync();
 
       switch (choice) {
         case '1':
           stdout.write("Department ID: ");
           int id = int.parse(stdin.readLineSync()!);
+          
           stdout.write("Department Name: ");
           String name = stdin.readLineSync()!;
-          hospital.addDepartment(Department(id: id, name: name, staffMembers: []));
+          hospital
+              .addDepartment(Department(id: id, name: name, staffMembers: []));
           break;
         case '2':
           for (var d in hospital.departments) {
@@ -372,7 +395,7 @@ String _getStaffExtraInfo(Staff s) {
       print("2. Rotate nurse shifts");
       print("3. View staff schedules");
       print("0. Back");
-      stdout.write("👉 Choose: ");
+      stdout.write(" Choose: ");
       String? choice = stdin.readLineSync();
 
       switch (choice) {
@@ -395,8 +418,10 @@ String _getStaffExtraInfo(Staff s) {
 
   void assignSchedule() {
     stdout.write("Enter staff ID: ");
-    int id = int.parse(stdin.readLineSync()!);
-    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id, orElse: () => throw Exception("Staff not found"));
+    // int id = int.parse(stdin.readLineSync()!);
+    String id = stdin.readLineSync()!;
+    var staff = hospital.getAllStaff().firstWhere((s) => s.id == id,
+        orElse: () => throw Exception("Staff not found"));
     stdout.write("Week number: ");
     int week = int.parse(stdin.readLineSync()!);
     print("Shift: 1.Morning 2.Afternoon 3.Night");
@@ -404,6 +429,7 @@ String _getStaffExtraInfo(Staff s) {
     Shift shift = Shift.values[shiftNum - 1];
     var schedule = Schedule(weekNumber: week, shift: shift);
     hospital.assignShiftToStaff(staff, schedule);
+    staffRepo.writeStaff(hospital.getAllStaff());
   }
 
   void rotateNurseShifts() {
@@ -411,7 +437,8 @@ String _getStaffExtraInfo(Staff s) {
     for (var n in nurses) {
       n.schedule?.rotateShift();
     }
-    print("✅ All nurse shifts rotated for next week.");
+    print("==> All nurse shifts rotated for next week.");
+    staffRepo.writeStaff(hospital.getAllStaff());
   }
 
   void viewSchedules() {
@@ -440,15 +467,19 @@ String _getStaffExtraInfo(Staff s) {
           break;
         case '2':
           for (var d in hospital.departments) {
-            double total = d.staffMembers.fold(0, (sum, s) => sum + s.calculateMonthlySalary());
+            double total = d.staffMembers
+                .fold(0, (sum, s) => sum + s.calculateMonthlySalary());
             print("${d.name}: \$${total}");
           }
           break;
         case '3':
           var sorted = hospital.getAllStaff()
-            ..sort((a, b) => b.calculateMonthlySalary().compareTo(a.calculateMonthlySalary()));
+            ..sort((a, b) => b
+                .calculateMonthlySalary()
+                .compareTo(a.calculateMonthlySalary()));
           for (var i = 0; i < sorted.length && i < 3; i++) {
-            print("${i + 1}. ${sorted[i].name} - \$${sorted[i].calculateMonthlySalary()}");
+            print(
+                "${i + 1}. ${sorted[i].name} - \$${sorted[i].calculateMonthlySalary()}");
           }
           break;
         case '0':
