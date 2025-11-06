@@ -84,7 +84,7 @@ void main() {
     expect(admin.calculateMonthlySalary(), equals(1500));
   });
 
-  test('ID continuity after generating multiple staff', () {
+  test('Test ID generation for multiple staff', () {
     IdGenerator.setInitialCounters(doctor: 2, nurse: 1, admin: 1);
 
     String newDoctorId = IdGenerator.generateDoctorId();
