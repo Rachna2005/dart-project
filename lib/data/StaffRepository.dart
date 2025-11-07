@@ -17,18 +17,23 @@ class StaffRepository {
     if (!file.existsSync()) return [];
 
     final content = file.readAsStringSync();
+    if (content.trim().isEmpty) return [];
+
     final data = jsonDecode(content);
     var staffJson = data['staff'] as List;
 
     return staffJson.map((s) {
       String type = s['type'];
 
-      // Load schedule if it exists
+      // Load schedule if exists
       Schedule? schedule;
       if (s.containsKey('schedule') && s['schedule'] != null) {
         schedule = Schedule(
           weekNumber: s['schedule']['weekNumber'],
-          shift: Shift.values[s['schedule']['shift']],
+          shift: _parseEnumValue<Shift>(
+            Shift.values,
+            s['schedule']['shift'],
+          ),
         );
       }
 
@@ -41,10 +46,17 @@ class StaffRepository {
             dateOfBirth: DateTime.parse(s['dateOfBirth']),
             contactNumber: s['contactNumber'],
             email: s['email'],
-            salary: s['salary'],
+            salary: (s['salary'] is String)
+                ? double.tryParse(s['salary']) ?? 0
+                : s['salary'].toDouble(),
             startDate: DateTime.parse(s['startDate']),
-            specialization: s['specialization'],
-            yearsOfExperience: s['yearsOfExperience'],
+            specialization: _parseEnumValue<DoctorSpecialization>(
+              DoctorSpecialization.values,
+              s['specialization'],
+            ),
+            yearsOfExperience: (s['yearsOfExperience'] is String)
+                ? int.tryParse(s['yearsOfExperience']) ?? 0
+                : s['yearsOfExperience'],
           );
           doctor.schedule = schedule;
           return doctor;
@@ -57,9 +69,14 @@ class StaffRepository {
             dateOfBirth: DateTime.parse(s['dateOfBirth']),
             contactNumber: s['contactNumber'],
             email: s['email'],
-            salary: s['salary'],
+            salary: (s['salary'] is String)
+                ? double.tryParse(s['salary']) ?? 0
+                : s['salary'].toDouble(),
             startDate: DateTime.parse(s['startDate']),
-            level: NurseLevel.values[s['level']],
+            level: _parseEnumValue<NurseLevel>(
+              NurseLevel.values,
+              s['level'],
+            ),
           );
           nurse.schedule = schedule;
           return nurse;
@@ -72,15 +89,20 @@ class StaffRepository {
             dateOfBirth: DateTime.parse(s['dateOfBirth']),
             contactNumber: s['contactNumber'],
             email: s['email'],
-            salary: s['salary'],
+            salary: (s['salary'] is String)
+                ? double.tryParse(s['salary']) ?? 0
+                : s['salary'].toDouble(),
             startDate: DateTime.parse(s['startDate']),
-            position: AdminPosition.values[s['position']],
+            position: _parseEnumValue<AdminPosition>(
+              AdminPosition.values,
+              s['position'],
+            ),
           );
           admin.schedule = schedule;
           return admin;
 
         default:
-          throw Exception("Unknown staff type");
+          throw Exception("Unknown staff type: $type");
       }
     }).toList();
   }
@@ -88,10 +110,12 @@ class StaffRepository {
   // ================= WRITE STAFF =================
   void writeStaff(List<Staff> staffList) {
     final file = File(filePath);
+
     // Ensure directory exists
-  if (!file.parent.existsSync()) {
-    file.parent.createSync(recursive: true);
-  }
+    if (!file.parent.existsSync()) {
+      file.parent.createSync(recursive: true);
+    }
+
     var staffJson = staffList.map((s) {
       Map<String, dynamic> base = {
         'id': s.id,
@@ -108,29 +132,45 @@ class StaffRepository {
       if (s.schedule != null) {
         base['schedule'] = {
           'weekNumber': s.schedule!.weekNumber,
-          'shift': s.schedule!.shift.index,
+          'shift': s.schedule!.shift.name,
         };
       }
 
       if (s is Doctor) {
         base['type'] = 'Doctor';
-        base['specialization'] = s.specialization;
+        base['specialization'] = s.specialization.name;
         base['yearsOfExperience'] = s.yearsOfExperience;
       } else if (s is Nurse) {
         base['type'] = 'Nurse';
-        base['level'] = s.level.index;
+        base['level'] = s.level.name;
       } else if (s is AdministrativeStaff) {
         base['type'] = 'Admin';
-        base['position'] = s.position.index;
+        base['position'] = s.position.name;
       }
-    
+
       return base;
     }).toList();
 
     var data = {'staff': staffJson};
     const encoder = JsonEncoder.withIndent('  ');
-    final jsonString = encoder.convert(data);
+    file.writeAsStringSync(encoder.convert(data));
+  }
 
-    file.writeAsStringSync(jsonString);
+  // ============ HELPER ==============
+  T _parseEnumValue<T>(List<T> values, dynamic input) {
+    if (input is int && input >= 0 && input < values.length) {
+      return values[input];
+    } else if (input is String) {
+      try {
+        return values.firstWhere(
+          (v) => v.toString().split('.').last.toLowerCase() ==
+              input.toLowerCase(),
+        );
+      } catch (_) {
+        return values.first; // fallback to first value
+      }
+    } else {
+      return values.first;
+    }
   }
 }
